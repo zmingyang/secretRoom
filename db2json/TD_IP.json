@@ -1,0 +1,20 @@
+{
+  "RECORDS": [
+    {
+      "id": 1,
+      "IPAddr": "192.168.0.112",
+      "iNum": 1,
+      "Dispose": 0,
+      "dscr": "1111",
+      "isConn": null
+    },
+    {
+      "id": 2,
+      "IPAddr": "192.168.0.48",
+      "iNum": 2,
+      "Dispose": 0,
+      "dscr": "222",
+      "isConn": null
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "RECORDS": [
+    {
+      "id": 1,
+      "CnComp": "测试关卡",
+      "EnComp": null,
+      "Lv": 1,
+      "CnDscr": "111",
+      "EnDscr": null,
+      "Points": 1,
+      "Golds": 1,
+      "DoubleCent": 1,
+      "LimitTime_s": 111
+    }
+  ]
+}
