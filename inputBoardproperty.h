@@ -1,12 +1,12 @@
-#ifndef IOBOARDPROPERTY_H
-#define IOBOARDPROPERTY_H
+#ifndef INPUTBOARDPROPERTY_H
+#define INPUTBOARDPROPERTY_H
 
 #include <QDialog>
 #include <QLabel>
 #include <QCheckBox>
 #include <QListWidget>
 
-#include "ioboard.h"
+#include "inputBoard.h"
 
 
 
@@ -15,12 +15,12 @@ namespace Ui { class ioBoardPropertyDialog; }
 QT_END_NAMESPACE
 
 // IO board popup menu
-class IOBoardProperty : public QDialog
+class inputBoardProperty : public QDialog
 {
     Q_OBJECT
 public:
-    IOBoardProperty(IOBoard *ioBoard);
-    ~IOBoardProperty();
+    inputBoardProperty(inputIOBoard *ioBoard);
+    ~inputBoardProperty();
     class IOBoardItem
     {
     public:
@@ -42,9 +42,9 @@ private slots:
 private:
     void generateMQTTMsg();
     Ui::ioBoardPropertyDialog *ui;
-    IOBoard *board;
+    inputIOBoard *board;
     std::vector <IOBoardItem *>boardlist;
 
 };
 
-#endif // IOBOARDPROPERTY_H
+#endif // INPUTBOARDPROPERTY_H

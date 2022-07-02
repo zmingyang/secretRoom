@@ -1,28 +1,40 @@
-#ifndef IOBOARD_H
-#define IOBOARD_H
+#ifndef OUTPUT_IOBOARD_H
+#define OUTPUT_IOBOARD_H
 
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <string>
 #include <vector>
-#include "fsm.h"
-class IOBoard: public QGraphicsItem //QGraphicsLineItem //
+#include "diagram.h"
+#include "edge.h"
+class QGraphicsView;
+
+class DB_SCM
+{
+public:
+    int id;
+    std::string IP_addr;
+    std::string SCM_addr;
+    std::string type;
+    std::string dscr;
+    std::map<std::string,int> pins;
+
+    std::string OldSendStr;
+    std::string titles;
+    std::string camp;
+    int Ipid;
+    int num;
+    //outputIOBoard *boardPanel;
+};
+
+class outputIOBoard: public QGraphicsItem //QGraphicsLineItem //
 {
 public:
 
-    class BoardNode
-    {
-        public:
-            std::vector <int> Pin;
 
-    };
-    int type; //0 ouput, 1 input
-    void *fsmIOBoard;
-    //DB_SCM *outPutBoard;
-    //SCM_DB *inPutBoard;
-    BoardNode node;
 
-    IOBoard(QGraphicsView *graphWidget, QString s, QMenu *ContextMenu, int Pin);
+    DB_SCM *node;
+    outputIOBoard(QGraphicsView *graphWidget, QString s, QMenu *ContextMenu);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF boundingRect() const override;
@@ -40,7 +52,7 @@ protected:
 
 //    void updateBoardState(std::string msg);
 //    void sentBoardcmd(std::string msg );
-      void DoUpdate( int number, int PinVal);
+      void DoUpdate( std::string key, int PinVal);
 
 
 private:

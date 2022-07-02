@@ -70,6 +70,7 @@ Node::Node(QGraphicsView *graphScene, QString s, QMenu *ContextMenu)
     setZValue(-1);
     bashColor = Qt::yellow;
     myContextMenu = ContextMenu;
+
 }
 //! [0]
 

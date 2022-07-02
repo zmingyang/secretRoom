@@ -87,6 +87,7 @@ public:
     };
     stateNode node;
 
+
     Node(QGraphicsView *graphWidget, QString text, QMenu *ContextMenu);
 
     void addEdge(Edge *edge);

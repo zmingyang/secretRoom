@@ -5,8 +5,8 @@
 #include "fsm.h"
 
 #include "mqtt.h"
-#include "ioboard.h"
-#include "ioboardproperty.h"
+#include "outputBoard.h"
+#include "inputBoardproperty.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mainTimer = new QTimer(this);
     connect(mainTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()));
-    mainTimer->start(1000);
+    mainTimer->start(100);
 }
 
 

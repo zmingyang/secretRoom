@@ -80,6 +80,7 @@ class Edge : public QGraphicsItem //QGraphicsLineItem //
 
 
     stateNode_IF IF;
+    int ElapsedTime;
 
     Edge(Node *sourceNode, Node *destNode, QMenu *ContextMenu);
 

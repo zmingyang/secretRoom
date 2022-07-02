@@ -7,8 +7,14 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
-#include "edge.h"
+#include "diagram.h"
 #include "node.h"
+
+#include "inputBoard.h"
+#include "outputBoard.h"
+
+class inputIOBoard;
+class outputIOBoard;
 
 class TD_IP
 {
@@ -23,127 +29,8 @@ public:
     int num;
 };
 
-class DB_SCM
-{
-public:
-    int id;
-    std::string IP_addr;
-    std::string SCM_addr;
-    std::string type;
-    std::string dscr;
-    int P00;
-    int P01;
-    int P02;
-    int P03;
-    int P04;
-    int P05;
-    int P06;
-    int P07;
 
-    int P10;
-    int P11;
-    int P12;
-    int P13;
-    int P14;
-    int P15;
-    int P16;
-    int P17;
 
-    int P20;
-    int P21;
-    int P22;
-    int P23;
-    int P24;
-    int P25;
-    int P26;
-    int P27;
-
-    int P30;
-    int P31;
-    int P32;
-    int P33;
-    int P34;
-    int P35;
-    int P36;
-    int P37;
-
-    int V01;
-    int V02;
-    int V03;
-    int V04;
-    int V05;
-    int V06;
-    int V07;
-    int V08;
-    int V09;
-    int V10;
-    std::string OldSendStr;
-    std::string titles;
-    std::string camp;
-    int Ipid;
-    int num;
-};
-
-class SCM_DB
-{
-public:
-    int id;
-    std::string IP_addr;
-    std::string SCM_addr;
-    std::string type;
-    std::string dscr;
-    int P00;
-    int P01;
-    int P02;
-    int P03;
-    int P04;
-    int P05;
-    int P06;
-    int P07;
-
-    int P10;
-    int P11;
-    int P12;
-    int P13;
-    int P14;
-    int P15;
-    int P16;
-    int P17;
-
-    int P20;
-    int P21;
-    int P22;
-    int P23;
-    int P24;
-    int P25;
-    int P26;
-    int P27;
-
-    int P30;
-    int P31;
-    int P32;
-    int P33;
-    int P34;
-    int P35;
-    int P36;
-    int P37;
-
-    int V01;
-    int V02;
-    int V03;
-    int V04;
-    int V05;
-    int V06;
-    int V07;
-    int V08;
-    int V09;
-    int V10;
-    std::string OldSendStr;
-    std::string titles;
-    std::string camp;
-    int Ipid;
-    int num;
-};
 
 
 
@@ -162,6 +49,10 @@ class stateNode_Do
         int waitss;
         int isDo;
         int SCM_ID;
+
+        //other flag;
+        int elapseTimes;
+        int NeedDo;
 };
 
 class stateMachine
@@ -171,20 +62,25 @@ class stateMachine
         int createBoard(  QGraphicsView *in, QGraphicsScene *s, QMenu *menu  );
 
         int getNode_D_by_ID(int id, Node **n);
+        int getNode_D_IF_by_ID(int id, Edge **n);
+
         int sentIOBoardMsg_by_ID(int id);
-        int sentIOBoardMsg_by_BoardID(int id);
-        int update_DB_SCM_IOBoard(int id, std::vector<int> pins);
+        int sentIOBoardMsg_by_BoardID(std::string SCM_ID);
+
+        int update_DB_SCM_IOBoard( std::string  scmID, std::vector<int> pins);
+        int update_DB_SCM_IOBoard(stateNode_Do * doNode);
 
         int updateIOBoardMsg_by_ID( std::string msg);
+
 
         std::vector <std::vector<Node*>> Node_D;
         std::vector<Edge *> Node_IF;
         std::vector<stateNode_Do *> Node_Do;
-        std::vector<SCM_DB*> Node_SCM_DB;
-        std::vector<DB_SCM*> Node_DB_SCM;
+        std::vector<inputIOBoard*> Node_SCM_DB;
+        std::vector<outputIOBoard*> Node_DB_SCM;
         std::vector<TD_IP*> Node_TD_IP;
 
-        DB_SCM* search_DB_SCM_by_ID(int SCM_ID);
+        DB_SCM* search_DB_SCM_by_ID(std::string SCM_ID);
 
         int tick();
 

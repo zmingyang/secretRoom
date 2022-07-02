@@ -8,8 +8,28 @@
 #include "fsm.h"
 #include "msgQueue.hpp"
 #include "cJSON.h"
-#include "ioboard.h"
+#include "inputBoard.h"
+#include "outputBoard.h"
 
+
+
+static void Stringsplit(const std::string& str, const char split, std::vector<std::string>& res)
+{
+    if (str == "")		return;
+    //在字符串末尾也加入分隔符，方便截取最后一段
+    std::string strs = str + split;
+    size_t pos = strs.find(split);
+
+    // 若找不到内容则字符串搜索函数返回 npos
+    while (pos != strs.npos)
+    {
+        std::string temp = strs.substr(0, pos);
+        res.push_back(temp);
+        //去掉已分割的字符串,在剩下的字符串中进行分割
+        strs = strs.substr(pos + 1, strs.size());
+        pos = strs.find(split);
+    }
+}
 
 stateMachine fsm;
 #define TD_Task_D_FILEPATH "db2json//TD_Task_D.json"
@@ -147,64 +167,55 @@ int stateMachine::load_TD_SCM_TO_DB()
       newSNode->SCM_addr = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "SCM_addr"));
       newSNode->type = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "type"));
       newSNode->dscr = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "dscr"));
-      newSNode->P00 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P00" )->valueint;
-      newSNode->P01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P01" )->valueint;
-      newSNode->P02 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P02" )->valueint;
-      newSNode->P03 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P03" )->valueint;
-      newSNode->P04 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P04" )->valueint;
-      newSNode->P05 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P05" )->valueint;
-      newSNode->P06 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P06" )->valueint;
-      newSNode->P07 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P07" )->valueint;
+      newSNode->pins["P00"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P00" )->valueint;
+      newSNode->pins["P01"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P01" )->valueint;
+      newSNode->pins["P02"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P02" )->valueint;
+      newSNode->pins["P03"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P03" )->valueint;
+      newSNode->pins["P04"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P04" )->valueint;
+      newSNode->pins["P05"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P05" )->valueint;
+      newSNode->pins["P06"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P06" )->valueint;
+      newSNode->pins["P07"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P07" )->valueint;
 
-      newSNode->P10 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P10" )->valueint;
-      newSNode->P11 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P11" )->valueint;
-      newSNode->P12 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P12" )->valueint;
-      newSNode->P13 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P13" )->valueint;
-      newSNode->P14 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P14" )->valueint;
-      newSNode->P15 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P15" )->valueint;
-      newSNode->P16 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P16" )->valueint;
-      newSNode->P17 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P17" )->valueint;
+      newSNode->pins["P10"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P10" )->valueint;
+      newSNode->pins["P11"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P11" )->valueint;
+      newSNode->pins["P12"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P12" )->valueint;
+      newSNode->pins["P13"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P13" )->valueint;
+      newSNode->pins["P14"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P14" )->valueint;
+      newSNode->pins["P15"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P15" )->valueint;
+      newSNode->pins["P16"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P16" )->valueint;
+      newSNode->pins["P17"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P17" )->valueint;
 
-      newSNode->P20 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P20" )->valueint;
-      newSNode->P21 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P21" )->valueint;
-      newSNode->P22 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P22" )->valueint;
-      newSNode->P23 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P23" )->valueint;
-      newSNode->P24 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P24" )->valueint;
-      newSNode->P25 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P25" )->valueint;
-      newSNode->P26 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P26" )->valueint;
-      newSNode->P27 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P27" )->valueint;
+      newSNode->pins["P20"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P20" )->valueint;
+      newSNode->pins["P21"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P21" )->valueint;
+      newSNode->pins["P22"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P22" )->valueint;
+      newSNode->pins["P23"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P23" )->valueint;
+      newSNode->pins["P24"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P24" )->valueint;
+      newSNode->pins["P25"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P25" )->valueint;
+      newSNode->pins["P26"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P26" )->valueint;
+      newSNode->pins["P27"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P27" )->valueint;
 
-      newSNode->P30 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P30" )->valueint;
-      newSNode->P31 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P31" )->valueint;
-      newSNode->P32 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P32" )->valueint;
-      newSNode->P33 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P33" )->valueint;
-      newSNode->P34 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P34" )->valueint;
-      newSNode->P35 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P35" )->valueint;
-      newSNode->P36 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P36" )->valueint;
-      newSNode->P37 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P37" )->valueint;
+      newSNode->pins["P30"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P30" )->valueint;
+      newSNode->pins["P31"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P31" )->valueint;
+      newSNode->pins["P32"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P32" )->valueint;
+      newSNode->pins["P33"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P33" )->valueint;
+      newSNode->pins["P34"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P34" )->valueint;
+      newSNode->pins["P35"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P35" )->valueint;
+      newSNode->pins["P36"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P36" )->valueint;
+      newSNode->pins["P37"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P37" )->valueint;
 
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P00" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P01" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P02" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P03" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P04" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P05" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P06" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P07" )->valueint;
+
 
        newSNode->titles =  cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "titles"));
        newSNode->camp = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "camp"));
        newSNode->Ipid = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "Ipid" )->valueint;
        newSNode->num = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "num" )->valueint;
-       Node_SCM_DB.push_back(newSNode);
 
-
-       IOBoard *newBoard = new IOBoard(IOBoardGraphicsView, QString::fromLocal8Bit("IO输入板-") + QString::number(newSNode->id,10), IOBoardmenu, 30);
-       newBoard->fsmIOBoard = newSNode;
-       newBoard-> type = 1; //input ioBoard
-       //newBoard->node.id = newSNode->id;
-       IOBoardScene->addItem(newBoard);
+       inputIOBoard *newBoard = new inputIOBoard(IOBoardGraphicsView, QString::fromLocal8Bit("IO输入板-") + QString::number(newSNode->id,10), IOBoardmenu);
+       newBoard->node =newSNode;
        newBoard->setPos(QPointF(320, i*60));
+       IOBoardScene->addItem(newBoard);
+       Node_SCM_DB.push_back(newBoard);
+
    }
 
 
@@ -270,62 +281,57 @@ int stateMachine::load_TD_DB_TO_SCM()
       newSNode->SCM_addr = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "SCM_addr"));
       newSNode->type = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "type"));
       newSNode->dscr = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "dscr"));
-      newSNode->P00 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P00" )->valueint;
-      newSNode->P01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P01" )->valueint;
-      newSNode->P02 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P02" )->valueint;
-      newSNode->P03 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P03" )->valueint;
-      newSNode->P04 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P04" )->valueint;
-      newSNode->P05 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P05" )->valueint;
-      newSNode->P06 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P06" )->valueint;
-      newSNode->P07 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P07" )->valueint;
+      newSNode->pins["P00"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P00" )->valueint;
+      newSNode->pins["P01"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P01" )->valueint;
+      newSNode->pins["P02"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P02" )->valueint;
+      newSNode->pins["P03"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P03" )->valueint;
+      newSNode->pins["P04"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P04" )->valueint;
+      newSNode->pins["P05"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P05" )->valueint;
+      newSNode->pins["P06"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P06" )->valueint;
+      newSNode->pins["P07"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P07" )->valueint;
 
-      newSNode->P10 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P10" )->valueint;
-      newSNode->P11 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P11" )->valueint;
-      newSNode->P12 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P12" )->valueint;
-      newSNode->P13 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P13" )->valueint;
-      newSNode->P14 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P14" )->valueint;
-      newSNode->P15 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P15" )->valueint;
-      newSNode->P16 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P16" )->valueint;
-      newSNode->P17 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P17" )->valueint;
+      newSNode->pins["P10"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P10" )->valueint;
+      newSNode->pins["P11"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P11" )->valueint;
+      newSNode->pins["P12"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P12" )->valueint;
+      newSNode->pins["P13"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P13" )->valueint;
+      newSNode->pins["P14"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P14" )->valueint;
+      newSNode->pins["P15"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P15" )->valueint;
+      newSNode->pins["P16"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P16" )->valueint;
+      newSNode->pins["P17"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P17" )->valueint;
 
-      newSNode->P20 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P20" )->valueint;
-      newSNode->P21 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P21" )->valueint;
-      newSNode->P22 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P22" )->valueint;
-      newSNode->P23 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P23" )->valueint;
-      newSNode->P24 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P24" )->valueint;
-      newSNode->P25 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P25" )->valueint;
-      newSNode->P26 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P26" )->valueint;
-      newSNode->P27 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P27" )->valueint;
+      newSNode->pins["P20"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P20" )->valueint;
+      newSNode->pins["P21"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P21" )->valueint;
+      newSNode->pins["P22"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P22" )->valueint;
+      newSNode->pins["P23"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P23" )->valueint;
+      newSNode->pins["P24"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P24" )->valueint;
+      newSNode->pins["P25"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P25" )->valueint;
+      newSNode->pins["P26"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P26" )->valueint;
+      newSNode->pins["P27"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P27" )->valueint;
 
-      newSNode->P30 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P30" )->valueint;
-      newSNode->P31 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P31" )->valueint;
-      newSNode->P32 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P32" )->valueint;
-      newSNode->P33 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P33" )->valueint;
-      newSNode->P34 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P34" )->valueint;
-      newSNode->P35 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P35" )->valueint;
-      newSNode->P36 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P36" )->valueint;
-      newSNode->P37 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P37" )->valueint;
+      newSNode->pins["P30"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P30" )->valueint;
+      newSNode->pins["P31"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P31" )->valueint;
+      newSNode->pins["P32"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P32" )->valueint;
+      newSNode->pins["P33"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P33" )->valueint;
+      newSNode->pins["P34"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P34" )->valueint;
+      newSNode->pins["P35"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P35" )->valueint;
+      newSNode->pins["P36"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P36" )->valueint;
+      newSNode->pins["P37"] = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P37" )->valueint;
 
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P00" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P01" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P02" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P03" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P04" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P05" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P06" )->valueint;
-//      newSNode->V01 = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "P07" )->valueint;
+
 
        newSNode->titles =  cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "titles"));
        newSNode->camp = cJSON_GetStringValue(cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "camp"));
        newSNode->Ipid = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "Ipid" )->valueint;
        newSNode->num = cJSON_GetObjectItem(cJSON_GetArrayItem(array, i), "num" )->valueint;
-       Node_DB_SCM.push_back(newSNode);
 
-       IOBoard *newBoard = new IOBoard(IOBoardGraphicsView, QString::fromLocal8Bit("IO输出板-") + QString::number(newSNode->id,10), IOBoardmenu, 30);
-       newBoard->fsmIOBoard = newSNode;
-       newBoard-> type = 0;
+
+       outputIOBoard *newBoard = new outputIOBoard(IOBoardGraphicsView, QString::fromLocal8Bit("IO输出板-") + QString::number(newSNode->id,10), IOBoardmenu);
        IOBoardScene->addItem(newBoard);
        newBoard->setPos(QPointF(0, i*60));
+       newBoard->node = newSNode;
+       Node_DB_SCM.push_back(newBoard);
+
+
 
    }
 
@@ -451,6 +457,20 @@ int stateMachine::getNode_D_by_ID(int id, Node **n)
                 *n = Node_D[i][ii];
                 return 0;
             }
+        }
+    }
+    return 1;
+}
+
+int stateMachine::getNode_D_IF_by_ID(int id, Edge **n)
+{
+    for(int i = 0; i < Node_IF.size(); i++)
+    {
+
+        if( Node_IF[i]->IF.id == id )
+        {
+            *n = Node_IF[i];
+            return 0;
         }
     }
     return 1;
@@ -711,55 +731,85 @@ void tickIOBoard()
 //}
 
 
-int stateMachine::update_DB_SCM_IOBoard(int id, std::vector<int> pins)
+int stateMachine::update_DB_SCM_IOBoard(stateNode_Do * doNode)
 {
-    DB_SCM* dbScm = search_DB_SCM_by_ID(id);
+
+    std::vector<std::string> Pvector,Vvector;
+
+
+    Stringsplit(doNode->P, ',', Pvector);
+    Stringsplit(doNode->V, ',', Vvector);
+
+    for(int i = 0; i < Node_DB_SCM.size(); i++)
+    {
+        if(Node_DB_SCM[i]->node->SCM_addr  == doNode->DB_TO_SCM_Addr )
+        {
+
+            for(int ii = 0; ii < Pvector.size();ii++)
+            {
+                char * pEnd;
+                std::string key = Pvector[ii];
+                std::string val = Vvector[ii];
+                Node_DB_SCM[i]->node->pins[Pvector[ii]] = strtol(Vvector[ii].c_str(), &pEnd, 10);
+
+            }
+            Node_DB_SCM[i]->update();
+
+        }
+    }
+
+
+}
+
+int stateMachine::update_DB_SCM_IOBoard(std::string  scmID, std::vector<int> pins)
+{
+    DB_SCM* dbScm = search_DB_SCM_by_ID(scmID);
     if(dbScm == NULL)
     {
         return -1;
     }
 
-    dbScm->P00 = pins[0];
-    dbScm->P01 = pins[1];
-    dbScm->P02 = pins[2];
-    dbScm->P03 = pins[3];
-    dbScm->P04 = pins[4];
-    dbScm->P05 = pins[5];
+    dbScm->pins["P00"] = pins[0];
+    dbScm->pins["P01"] = pins[1];
+    dbScm->pins["P02"] = pins[2];
+    dbScm->pins["P03"] = pins[3];
+    dbScm->pins["P04"] = pins[4];
+    dbScm->pins["P05"] = pins[5];
 
-    dbScm->P06 = pins[6];
-    dbScm->P07 = pins[7];
-    dbScm->P10 = pins[8];
-    dbScm->P11 = pins[9];
-    dbScm->P12 = pins[10];
-    dbScm->P13 = pins[11];
+    dbScm->pins["P06"] = pins[6];
+    dbScm->pins["P07"] = pins[7];
+    dbScm->pins["P10"] = pins[8];
+    dbScm->pins["P11"] = pins[9];
+    dbScm->pins["P12"] = pins[10];
+    dbScm->pins["P13"] = pins[11];
 
-    dbScm->P14 = pins[12];
-    dbScm->P15 = pins[13];
-    dbScm->P16 = pins[14];
-    dbScm->P17 = pins[15];
-    dbScm->P20 = pins[16];
-    dbScm->P21 = pins[17];
+    dbScm->pins["P14"] = pins[12];
+    dbScm->pins["P15"] = pins[13];
+    dbScm->pins["P16"] = pins[14];
+    dbScm->pins["P17"] = pins[15];
+    dbScm->pins["P20"] = pins[16];
+    dbScm->pins["P21"] = pins[17];
 
-    dbScm->P22 = pins[18];
-    dbScm->P23 = pins[19];
-    dbScm->P24 = pins[20];
-    dbScm->P25 = pins[21];
-    dbScm->P26 = pins[22];
-    dbScm->P27 = pins[23];
+    dbScm->pins["P22"] = pins[18];
+    dbScm->pins["P23"] = pins[19];
+    dbScm->pins["P24"] = pins[20];
+    dbScm->pins["P25"] = pins[21];
+    dbScm->pins["P26"] = pins[22];
+    dbScm->pins["P27"] = pins[23];
 
-    dbScm->P32 = pins[24];
-    dbScm->P33 = pins[25];
-    dbScm->P34 = pins[26];
-    dbScm->P35 = pins[27];
-    dbScm->P36 = pins[28];
-    dbScm->P37 = pins[29];
+    dbScm->pins["P32"] = pins[24];
+    dbScm->pins["P33"] = pins[25];
+    dbScm->pins["P34"] = pins[26];
+    dbScm->pins["P35"] = pins[27];
+    dbScm->pins["P36"] = pins[28];
+    dbScm->pins["P37"] = pins[29];
 
 
 }
 
-int stateMachine::sentIOBoardMsg_by_BoardID(int id)
+int stateMachine::sentIOBoardMsg_by_BoardID(std::string SCM_ID )
 {
-    DB_SCM* dbScm = search_DB_SCM_by_ID(id);
+    DB_SCM* dbScm = search_DB_SCM_by_ID( SCM_ID);
     if(dbScm == NULL)
     {
         return -1;
@@ -773,27 +823,17 @@ int stateMachine::sentIOBoardMsg_by_BoardID(int id)
 
     char * pEnd;
     unsigned char scmAddr =  strtol(dbScm->SCM_addr.c_str(),&pEnd, 2);
-
     unsigned char C0 = unsigned (scmAddr);
-
     unsigned char C1 = strtol(dbScm->type.c_str(),&pEnd, 2);
-
-    unsigned char C2 = unsigned (dbScm->P05<<5)|(dbScm->P04<<4)|(dbScm->P03<<3)|(dbScm->P02<<2)|(dbScm->P01<<1)|(dbScm->P00<<0);
-
-    unsigned char C3 = unsigned (dbScm->P13<<5)|(dbScm->P12<<4)|(dbScm->P11<<3)|(dbScm->P10<<2)|(dbScm->P07<<1)|(dbScm->P06<<0);
-
-    unsigned char C4 = unsigned (dbScm->P21<<5)|(dbScm->P20<<4)|(dbScm->P17<<3)|(dbScm->P16<<2)|(dbScm->P15<<1)|(dbScm->P14<<0);
-
-    unsigned char C5 = unsigned (dbScm->P27<<5)|(dbScm->P26<<4)|(dbScm->P25<<3)|(dbScm->P24<<2)|(dbScm->P23<<1)|(dbScm->P22<<0);
-
-    unsigned char C6 = unsigned (dbScm->P37<<5)|(dbScm->P36<<4)|(dbScm->P35<<3)|(dbScm->P34<<2)|(dbScm->P33<<1)|(dbScm->P32<<0);
-
+    unsigned char C2 = unsigned (dbScm->pins["P05"]<<5)|(dbScm->pins["P04"]<<4)|(dbScm->pins["P03"]<<3)|(dbScm->pins["P02"]<<2)|(dbScm->pins["P01"]<<1)|(dbScm->pins["P00"]<<0);
+    unsigned char C3 = unsigned (dbScm->pins["P13"]<<5)|(dbScm->pins["P12"]<<4)|(dbScm->pins["P11"]<<3)|(dbScm->pins["P10"]<<2)|(dbScm->pins["P07"]<<1)|(dbScm->pins["P06"]<<0);
+    unsigned char C4 = unsigned (dbScm->pins["P21"]<<5)|(dbScm->pins["P20"]<<4)|(dbScm->pins["P17"]<<3)|(dbScm->pins["P16"]<<2)|(dbScm->pins["P15"]<<1)|(dbScm->pins["P14"]<<0);
+    unsigned char C5 = unsigned (dbScm->pins["P27"]<<5)|(dbScm->pins["P26"]<<4)|(dbScm->pins["P25"]<<3)|(dbScm->pins["P24"]<<2)|(dbScm->pins["P23"]<<1)|(dbScm->pins["P22"]<<0);
+    unsigned char C6 = unsigned (dbScm->pins["P37"]<<5)|(dbScm->pins["P36"]<<4)|(dbScm->pins["P35"]<<3)|(dbScm->pins["P34"]<<2)|(dbScm->pins["P33"]<<1)|(dbScm->pins["P32"]<<0);
 
     ///test
     //84 41 01 03 02 01 00 00 cc ff
-
     /// test
-
 
     unsigned int C7C8 = C0 + C1 + C2 +C3 + C4 + C5 + C6;
 
@@ -816,7 +856,7 @@ int stateMachine::sentIOBoardMsg_by_ID(int id)
         if(Node_Do[i]->Task_D_ID == id)
         {
 
-            DB_SCM* dbScm = search_DB_SCM_by_ID(Node_Do[i]->SCM_ID);
+            DB_SCM* dbScm = search_DB_SCM_by_ID(Node_Do[i]->DB_TO_SCM_Addr);
             if(dbScm == NULL)
             {
                 continue;
@@ -833,11 +873,11 @@ int stateMachine::sentIOBoardMsg_by_ID(int id)
 
             unsigned char C0 = unsigned (scmAddr);
             unsigned char C1 = strtol(dbScm->type.c_str(),&pEnd, 2);
-            unsigned char C2 = unsigned (dbScm->P05<<5)|(dbScm->P04<<4)|(dbScm->P03<<3)|(dbScm->P02<<2)|(dbScm->P01<<1)|(dbScm->P00<<0);
-            unsigned char C3 = unsigned (dbScm->P13<<5)|(dbScm->P12<<4)|(dbScm->P11<<3)|(dbScm->P10<<2)|(dbScm->P07<<1)|(dbScm->P06<<0);
-            unsigned char C4 = unsigned (dbScm->P21<<5)|(dbScm->P20<<4)|(dbScm->P17<<3)|(dbScm->P16<<2)|(dbScm->P15<<1)|(dbScm->P14<<0);
-            unsigned char C5 = unsigned (dbScm->P27<<5)|(dbScm->P26<<4)|(dbScm->P25<<3)|(dbScm->P24<<2)|(dbScm->P23<<1)|(dbScm->P22<<0);
-            unsigned char C6 = unsigned (dbScm->P37<<5)|(dbScm->P36<<4)|(dbScm->P35<<3)|(dbScm->P34<<2)|(dbScm->P33<<1)|(dbScm->P32<<0);
+            unsigned char C2 = unsigned (dbScm->pins["P05"]<<5)|(dbScm->pins["P04"]<<4)|(dbScm->pins["P03"]<<3)|(dbScm->pins["P02"]<<2)|(dbScm->pins["P01"]<<1)|(dbScm->pins["P00"]<<0);
+            unsigned char C3 = unsigned (dbScm->pins["P13"]<<5)|(dbScm->pins["P12"]<<4)|(dbScm->pins["P11"]<<3)|(dbScm->pins["P10"]<<2)|(dbScm->pins["P07"]<<1)|(dbScm->pins["P06"]<<0);
+            unsigned char C4 = unsigned (dbScm->pins["P21"]<<5)|(dbScm->pins["P20"]<<4)|(dbScm->pins["P17"]<<3)|(dbScm->pins["P16"]<<2)|(dbScm->pins["P15"]<<1)|(dbScm->pins["P14"]<<0);
+            unsigned char C5 = unsigned (dbScm->pins["P27"]<<5)|(dbScm->pins["P26"]<<4)|(dbScm->pins["P25"]<<3)|(dbScm->pins["P24"]<<2)|(dbScm->pins["P23"]<<1)|(dbScm->pins["P22"]<<0);
+            unsigned char C6 = unsigned (dbScm->pins["P37"]<<5)|(dbScm->pins["P36"]<<4)|(dbScm->pins["P35"]<<3)|(dbScm->pins["P34"]<<2)|(dbScm->pins["P33"]<<1)|(dbScm->pins["P32"]<<0);
 
 
             ///test
@@ -865,23 +905,6 @@ int stateMachine::sentIOBoardMsg_by_ID(int id)
 }
 
 
-static void Stringsplit(const std::string& str, const char split, std::vector<std::string>& res)
-{
-    if (str == "")		return;
-    //在字符串末尾也加入分隔符，方便截取最后一段
-    std::string strs = str + split;
-    size_t pos = strs.find(split);
-
-    // 若找不到内容则字符串搜索函数返回 npos
-    while (pos != strs.npos)
-    {
-        std::string temp = strs.substr(0, pos);
-        res.push_back(temp);
-        //去掉已分割的字符串,在剩下的字符串中进行分割
-        strs = strs.substr(pos + 1, strs.size());
-        pos = strs.find(split);
-    }
-}
 
 static std::vector<int> Transform(int n)
 {
@@ -934,7 +957,7 @@ int stateMachine::updateIOBoardMsg_by_ID( std::string msg)
 
     for(int i = 0; i < fsm.Node_SCM_DB.size(); i++)
     {
-        if(fsm.Node_SCM_DB[i]->IP_addr == IP && fsm.Node_SCM_DB[i]->SCM_addr ==  scmAddrStr)
+        if(fsm.Node_SCM_DB[i]->node->IP_addr == IP && fsm.Node_SCM_DB[i]->node->SCM_addr ==  scmAddrStr)
         {
 
 
@@ -944,40 +967,40 @@ int stateMachine::updateIOBoardMsg_by_ID( std::string msg)
 //            unsigned char C5 = unsigned (dbScm->P27<<5)|(dbScm->P26<<4)|(dbScm->P25<<3)|(dbScm->P24<<2)|(dbScm->P23<<1)|(dbScm->P22<<0);
 //            unsigned char C6 = unsigned (dbScm->P37<<5)|(dbScm->P36<<4)|(dbScm->P35<<3)|(dbScm->P34<<2)|(dbScm->P33<<1)|(dbScm->P32<<0);
 
-            fsm.Node_SCM_DB[i]->P00 = (buf[2] >> 0)& 0x01;
-            fsm.Node_SCM_DB[i]->P01 = (buf[2] >> 1)& 0x01;
-            fsm.Node_SCM_DB[i]->P02 = (buf[2] >> 2)& 0x01;
-            fsm.Node_SCM_DB[i]->P03 = (buf[2] >> 3)& 0x01;
-            fsm.Node_SCM_DB[i]->P04 = (buf[2] >> 4)& 0x01;
-            fsm.Node_SCM_DB[i]->P05 = (buf[2] >> 5)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P00"] = (buf[2] >> 0)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P01"] = (buf[2] >> 1)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P02"] = (buf[2] >> 2)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P03"] = (buf[2] >> 3)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P04"] = (buf[2] >> 4)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P05"] = (buf[2] >> 5)& 0x01;
 
-            fsm.Node_SCM_DB[i]->P06 = (buf[3] >> 0)& 0x01;
-            fsm.Node_SCM_DB[i]->P07 = (buf[3] >> 1)& 0x01;
-            fsm.Node_SCM_DB[i]->P10 = (buf[3] >> 2)& 0x01;
-            fsm.Node_SCM_DB[i]->P11 = (buf[3] >> 3)& 0x01;
-            fsm.Node_SCM_DB[i]->P12 = (buf[3] >> 4)& 0x01;
-            fsm.Node_SCM_DB[i]->P13 = (buf[3] >> 5)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P06"] = (buf[3] >> 0)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P07"] = (buf[3] >> 1)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P10"] = (buf[3] >> 2)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P11"] = (buf[3] >> 3)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P12"] = (buf[3] >> 4)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P13"] = (buf[3] >> 5)& 0x01;
 
-            fsm.Node_SCM_DB[i]->P14 = (buf[4] >> 0)& 0x01;
-            fsm.Node_SCM_DB[i]->P15 = (buf[4] >> 1)& 0x01;
-            fsm.Node_SCM_DB[i]->P16 = (buf[4] >> 2)& 0x01;
-            fsm.Node_SCM_DB[i]->P17 = (buf[4] >> 3)& 0x01;
-            fsm.Node_SCM_DB[i]->P20 = (buf[4] >> 4)& 0x01;
-            fsm.Node_SCM_DB[i]->P21 = (buf[4] >> 5)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P14"] = (buf[4] >> 0)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P15"] = (buf[4] >> 1)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P16"] = (buf[4] >> 2)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P17"] = (buf[4] >> 3)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P20"] = (buf[4] >> 4)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P21"] = (buf[4] >> 5)& 0x01;
 
-            fsm.Node_SCM_DB[i]->P22 = (buf[5] >> 0)& 0x01;
-            fsm.Node_SCM_DB[i]->P23 = (buf[5] >> 1)& 0x01;
-            fsm.Node_SCM_DB[i]->P24 = (buf[5] >> 2)& 0x01;
-            fsm.Node_SCM_DB[i]->P25 = (buf[5] >> 3)& 0x01;
-            fsm.Node_SCM_DB[i]->P26 = (buf[5] >> 4)& 0x01;
-            fsm.Node_SCM_DB[i]->P27 = (buf[5] >> 5)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P22"] = (buf[5] >> 0)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P23"] = (buf[5] >> 1)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P24"] = (buf[5] >> 2)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P25"] = (buf[5] >> 3)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P26"] = (buf[5] >> 4)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P27"] = (buf[5] >> 5)& 0x01;
 
-            fsm.Node_SCM_DB[i]->P32 = (buf[6] >> 0)& 0x01;
-            fsm.Node_SCM_DB[i]->P33 = (buf[6] >> 1)& 0x01;
-            fsm.Node_SCM_DB[i]->P34 = (buf[6] >> 2)& 0x01;
-            fsm.Node_SCM_DB[i]->P35 = (buf[6] >> 3)& 0x01;
-            fsm.Node_SCM_DB[i]->P36 = (buf[6] >> 4)& 0x01;
-            fsm.Node_SCM_DB[i]->P37 = (buf[6] >> 5)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P32"] = (buf[6] >> 0)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P33"] = (buf[6] >> 1)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P34"] = (buf[6] >> 2)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P35"] = (buf[6] >> 3)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P36"] = (buf[6] >> 4)& 0x01;
+            fsm.Node_SCM_DB[i]->node->pins["P37"] = (buf[6] >> 5)& 0x01;
 
         }
     }
@@ -1017,13 +1040,13 @@ void stateMachine::generateMQTTMsg(int ipID, std::string rawMsg)
     }
 }
 
-DB_SCM* stateMachine::search_DB_SCM_by_ID(int SCM_ID)
+DB_SCM* stateMachine::search_DB_SCM_by_ID(std::string SCM_ID)
 {
     for(int i = 0; i < Node_DB_SCM.size(); i++)
     {
-        if(Node_DB_SCM[i]->id  == SCM_ID )
+        if(Node_DB_SCM[i]->node->SCM_addr  == SCM_ID )
         {
-            return Node_DB_SCM[i];
+            return Node_DB_SCM[i]->node;
         }
     }
     return NULL;
@@ -1054,21 +1077,116 @@ int stateMachine::createBoard( QGraphicsView *in, QGraphicsScene *s, QMenu *menu
 
 
 }
-
+static int firstTime = 1;
 int stateMachine::tick()
 {
-//  for(int i = 0; i < Node_D.size(); i++)
-//  {
+
+    if(firstTime == 1)
+    {
+        for(int i = 0; i < Node_D.size(); i++)
+        {
+            for(int ii = 0; ii < Node_D[i].size(); ii++)
+            {
+                if( Node_D[i][ii]->node.isBegin == 1 )
+                {
+                    Node_D[i][ii]->node.isPlaying = 1;
+                }
+            }
+
+        }
+        firstTime = 0;
+    }
 
 
-//      for(int ii = 0; i<Node_D[i].size(); ii++)
-//      {
-//          if( Node_D[i][ii]->node.isPlaying == 1 )
-//          {
 
-//              break;
-//          }
-//      }
+    for(int k = 0; k < Node_Do.size(); k++)
+    {
+        if ( Node_Do[k]->NeedDo == 1 )
+        {
+               Node_Do[k]->elapseTimes += 100;
+        }
+
+        if(Node_Do[k]->elapseTimes > Node_Do[k]->waitss)
+        {
+            //update DB_SCM
+            std::vector<int> pin;
+            update_DB_SCM_IOBoard(Node_Do[k]);
+
+            Node_Do[k]->NeedDo = 0;
+            Node_Do[k]->elapseTimes = 0;
+        }
+    }
+
+    //update DB_SCM
+    //update_DB_SCM_IOBoard();
+
+
+
+
+  for(int i = 0; i < Node_D.size(); i++)
+  {
+
+
+      for(int ii = 0; ii < Node_D[i].size(); ii++)
+      {
+          if( Node_D[i][ii]->node.isPlaying == 1 )  //This node running, check all IF nodes, ElapsedTime+100
+          {
+
+              for(int j = 0; j < Node_IF.size(); j++)
+              {
+
+                  if(Node_D[i][ii]->node.id == Node_IF[j]->IF.From_Task_D_ID)
+                  {
+
+                      if( Node_IF[j]->ElapsedTime < Node_IF[j]->IF.waitss )
+                      {
+                          Node_IF[j]->ElapsedTime += 100;
+                      }
+                      else
+                      {
+                        Node_IF[j]->ElapsedTime = 0;
+                        int fromNodeID = Node_IF[j]->IF.From_Task_D_ID;
+                        int toNodeID = Node_IF[j]->IF.To_Task_D_ID;
+
+                        Node *fromNodeD = NULL;
+                        Node *toNodeD = NULL;
+                        getNode_D_by_ID(fromNodeID, &fromNodeD);
+                        if (fromNodeD != NULL)
+                        {
+                            fromNodeD->node.isPlaying = 0;
+                            fromNodeD->setColor(Qt::red);
+                        }
+
+                        getNode_D_by_ID(toNodeID, &toNodeD);
+                        if (toNodeD != NULL)
+                        {
+                            toNodeD->node.isPlaying = 1;
+                            toNodeD->setColor(Qt::green);
+
+
+                            //Task_D_ID
+                            for(int k = 0; k < Node_Do.size(); k++)
+                            {
+                                if ( Node_Do[k]->Task_D_ID == toNodeD->node.id )
+                                {
+                                       Node_Do[k]->NeedDo = 1;
+                                       Node_Do[k]->elapseTimes = 0;
+                                }
+                            }
+                            //update DB_SCM
+                            //update_DB_SCM_IOBoard();
+                        }
+                      }
+
+                  }
+
+              }
+
+
+
+              break;
+          }
+      }
 
 
 //    for(int ii = 0; i<Node_D[i].size(); ii++)
@@ -1081,5 +1199,5 @@ int stateMachine::tick()
 
 
 
-//  }
+  }
 }
