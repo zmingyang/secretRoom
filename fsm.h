@@ -83,7 +83,7 @@ class stateMachine
         DB_SCM* search_DB_SCM_by_ID(std::string SCM_ID);
 
         int tick();
-
+        int backup();
     private:
         int load_TD_Task_D_Do();
         int load_TD_Task_D_IF();
@@ -91,6 +91,13 @@ class stateMachine
         int load_TD_DB_TO_SCM();
         int load_TD_SCM_TO_DB();
         int load_TD_IP();
+
+        int save_TD_Task_D_Do(std::string filename);
+        int save_TD_Task_D_IF(std::string filename);
+        int save_TD_Task_D(std::string filename);
+        int save_TD_DB_TO_SCM(std::string filename);
+        int save_TD_SCM_TO_DB(std::string filename);
+        int save_TD_IP(std::string filename);
 
 
 

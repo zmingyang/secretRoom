@@ -4,6 +4,10 @@
 
 #include <string>
 #include <math.h>
+#include <time.h>
+#include <QTime>
+#include <QDir>
+#include <QDate>
 
 #include "fsm.h"
 #include "msgQueue.hpp"
@@ -107,6 +111,56 @@ int stateMachine::load_TD_IP()
 
 
    free (buffer);
+
+
+   return 0;
+}
+
+int stateMachine::save_TD_IP( std::string filename )
+{
+
+   cJSON * root = cJSON_CreateObject();
+
+
+    cJSON * body = cJSON_CreateArray();
+
+   for(int i = 0; i < Node_TD_IP.size(); i++)
+   {
+        cJSON * bodyObj = cJSON_CreateObject();
+       cJSON_AddItemToObject(bodyObj, "id", cJSON_CreateNumber(Node_TD_IP[i]->id));
+       cJSON_AddItemToObject(bodyObj, "IPAddr", cJSON_CreateString(Node_TD_IP[i]->IPAddr.c_str()));
+
+       cJSON_AddItemToObject(bodyObj, "iNum", cJSON_CreateNumber( Node_TD_IP[i]->iNum  ));
+       cJSON_AddItemToObject(bodyObj, "Dispose", cJSON_CreateNumber( Node_TD_IP[i]->Dispose ));
+       cJSON_AddItemToObject(bodyObj, "dscr", cJSON_CreateString(Node_TD_IP[i]->dscr.c_str()));
+       cJSON_AddItemToObject(bodyObj, "isConn", cJSON_CreateNumber(Node_TD_IP[i]->isConn));
+        cJSON_AddItemToObject(bodyObj, "Port", cJSON_CreateNumber(Node_TD_IP[i]->Port));
+       cJSON_AddItemToObject(body, "RECORDS", bodyObj);
+   }
+    cJSON_AddItemToObject(root, "RECORDS", body);
+
+   char *printBuf = cJSON_Print(root);
+
+
+  FILE * pFile;
+  long lSize;
+  size_t result;
+
+  pFile = fopen ( filename.c_str() , "wb" );
+  if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+
+  // write the buffer  into the file:
+  lSize = strlen(printBuf);
+  result = fwrite( printBuf, 1, lSize,pFile);
+  if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+     /* the whole file is now loaded in the memory buffer. */
+
+  // terminate
+  fclose (pFile);
+
+
 
 
    return 0;
@@ -225,6 +279,63 @@ int stateMachine::load_TD_SCM_TO_DB()
    return 0;
 }
 
+
+int stateMachine::save_TD_SCM_TO_DB(std::string filename)
+{
+
+    cJSON * root = cJSON_CreateObject();
+    cJSON * body = cJSON_CreateArray();
+
+    for(int i = 0; i < Node_SCM_DB.size(); i++)
+    {
+
+       cJSON * bodyObj = cJSON_CreateObject();
+       cJSON_AddItemToObject(bodyObj, "id", cJSON_CreateString(std::to_string(Node_SCM_DB[i]->node->id).c_str()));
+       cJSON_AddItemToObject(bodyObj, "IP_addr", cJSON_CreateString(Node_SCM_DB[i]->node->IP_addr.c_str()));
+
+       cJSON_AddItemToObject(bodyObj, "SCM_addr", cJSON_CreateString( Node_SCM_DB[i]->node->SCM_addr.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "type", cJSON_CreateString( Node_SCM_DB[i]->node->type.c_str()));
+       cJSON_AddItemToObject(bodyObj, "dscr", cJSON_CreateString(Node_SCM_DB[i]->node->dscr.c_str() ));
+        for (auto x:Node_SCM_DB[i]->node->pins)
+        {
+            cJSON_AddItemToObject(bodyObj, x.first.c_str(), cJSON_CreateNumber(x.second ));
+        }
+
+       cJSON_AddItemToObject(bodyObj, "OldSendStr", cJSON_CreateString(Node_SCM_DB[i]->node->OldSendStr.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "titles", cJSON_CreateString(Node_SCM_DB[i]->node->titles.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "camp", cJSON_CreateString( Node_SCM_DB[i]->node->camp.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "Ipid", cJSON_CreateNumber(Node_SCM_DB[i]->node->Ipid ));
+       cJSON_AddItemToObject(bodyObj, "num", cJSON_CreateNumber(Node_SCM_DB[i]->node->num  ));
+
+
+       cJSON_AddItemToObject(body, "RECORDS", bodyObj);
+
+
+    }
+     cJSON_AddItemToObject(root, "RECORDS", body);
+
+    char *printBuf = cJSON_Print(root);
+
+
+   FILE * pFile;
+   long lSize;
+   size_t result;
+
+   pFile = fopen ( filename.c_str() , "wb" );
+   if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+
+   // write the buffer  into the file:
+   lSize = strlen(printBuf);
+   result = fwrite( printBuf, 1, lSize,pFile);
+   if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+   /* the whole file is now loaded in the memory buffer. */
+   // terminate
+   fclose (pFile);
+
+
+}
 int stateMachine::load_TD_DB_TO_SCM()
 {
     FILE * pFile;
@@ -343,6 +454,64 @@ int stateMachine::load_TD_DB_TO_SCM()
    return 0;
 }
 
+int stateMachine::save_TD_DB_TO_SCM(std::string filename)
+{
+
+    cJSON * root = cJSON_CreateObject();
+    cJSON * body = cJSON_CreateArray();
+
+    for(int i = 0; i < Node_DB_SCM.size(); i++)
+    {
+
+       cJSON * bodyObj = cJSON_CreateObject();
+       cJSON_AddItemToObject(bodyObj, "id", cJSON_CreateString(std::to_string(Node_DB_SCM[i]->node->id).c_str()));
+       cJSON_AddItemToObject(bodyObj, "IP_addr", cJSON_CreateString(Node_DB_SCM[i]->node->IP_addr.c_str()));
+
+       cJSON_AddItemToObject(bodyObj, "SCM_addr", cJSON_CreateString( Node_DB_SCM[i]->node->SCM_addr.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "type", cJSON_CreateString( Node_DB_SCM[i]->node->type.c_str()));
+       cJSON_AddItemToObject(bodyObj, "dscr", cJSON_CreateString(Node_DB_SCM[i]->node->dscr.c_str() ));
+        for (auto x:Node_DB_SCM[i]->node->pins)
+        {
+            cJSON_AddItemToObject(bodyObj, x.first.c_str(), cJSON_CreateNumber(x.second ));
+        }
+
+       cJSON_AddItemToObject(bodyObj, "OldSendStr", cJSON_CreateString(Node_DB_SCM[i]->node->OldSendStr.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "titles", cJSON_CreateString(Node_DB_SCM[i]->node->titles.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "camp", cJSON_CreateString( Node_DB_SCM[i]->node->camp.c_str() ));
+       cJSON_AddItemToObject(bodyObj, "Ipid", cJSON_CreateNumber(Node_DB_SCM[i]->node->Ipid ));
+       cJSON_AddItemToObject(bodyObj, "num", cJSON_CreateNumber(Node_DB_SCM[i]->node->num  ));
+
+
+       cJSON_AddItemToObject(body, "RECORDS", bodyObj);
+
+
+    }
+     cJSON_AddItemToObject(root, "RECORDS", body);
+
+    char *printBuf = cJSON_Print(root);
+
+
+   FILE * pFile;
+   long lSize;
+   size_t result;
+
+   pFile = fopen ( filename.c_str() , "wb" );
+   if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+
+   // write the buffer  into the file:
+   lSize = strlen(printBuf);
+   result = fwrite( printBuf, 1, lSize,pFile);
+   if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+   /* the whole file is now loaded in the memory buffer. */
+   // terminate
+   fclose (pFile);
+
+
+
+}
+
 int stateMachine::load_TD_Task_D_IF()
 {
     FILE * pFile;
@@ -445,6 +614,55 @@ int stateMachine::load_TD_Task_D_IF()
    return 0;
 }
 
+int stateMachine::save_TD_Task_D_IF( std::string filename )
+{
+
+    cJSON * root = cJSON_CreateObject();
+    cJSON * body = cJSON_CreateArray();
+
+    for(int i = 0; i < Node_IF.size(); i++)
+    {
+
+           cJSON * bodyObj = cJSON_CreateObject();
+           cJSON_AddItemToObject(bodyObj, "id", cJSON_CreateNumber(Node_IF[i]->IF.id));
+           cJSON_AddItemToObject(bodyObj, "From_Task_D_ID", cJSON_CreateNumber(Node_IF[i]->IF.From_Task_D_ID));
+
+           cJSON_AddItemToObject(bodyObj, "To_Task_D_ID", cJSON_CreateNumber( Node_IF[i]->IF.To_Task_D_ID ));
+           cJSON_AddItemToObject(bodyObj, "Dscr", cJSON_CreateString( Node_IF[i]->IF.Dscr.c_str()  ));
+           cJSON_AddItemToObject(bodyObj, "waitss", cJSON_CreateNumber( Node_IF[i]->IF.waitss ));
+
+
+           cJSON_AddItemToObject(body, "RECORDS", bodyObj);
+
+
+    }
+     cJSON_AddItemToObject(root, "RECORDS", body);
+
+    char *printBuf = cJSON_Print(root);
+
+
+   FILE * pFile;
+   long lSize;
+   size_t result;
+
+   pFile = fopen ( filename.c_str() , "wb" );
+   if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+
+   // write the buffer  into the file:
+   lSize = strlen(printBuf);
+   result = fwrite( printBuf, 1, lSize,pFile);
+   if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+   /* the whole file is now loaded in the memory buffer. */
+   // terminate
+   fclose (pFile);
+
+
+
+
+    return 0;
+}
 int stateMachine::getNode_D_by_ID(int id, Node **n)
 {
     for(int i = 0; i < Node_D.size(); i++)
@@ -548,7 +766,59 @@ int stateMachine::load_TD_Task_D_Do( )
    return 0;
 }
 
+int stateMachine::save_TD_Task_D_Do(std::string filename)
+{
 
+
+    cJSON * root = cJSON_CreateObject();
+    cJSON * body = cJSON_CreateArray();
+
+    for(int i = 0; i < Node_Do.size(); i++)
+    {
+
+           cJSON * bodyObj = cJSON_CreateObject();
+           cJSON_AddItemToObject(bodyObj, "id", cJSON_CreateNumber(Node_Do[i]->id));
+           cJSON_AddItemToObject(bodyObj, "Task_D_ID", cJSON_CreateNumber(Node_Do[i]->Task_D_ID));
+
+           cJSON_AddItemToObject(bodyObj, "DB_TO_SCM_Addr", cJSON_CreateString( Node_Do[i]->DB_TO_SCM_Addr.c_str() ));
+           cJSON_AddItemToObject(bodyObj, "P", cJSON_CreateString( Node_Do[i]->P.c_str() ));
+           cJSON_AddItemToObject(bodyObj, "V", cJSON_CreateString( Node_Do[i]->V.c_str() ));
+           cJSON_AddItemToObject(bodyObj, "Dscr", cJSON_CreateString( Node_Do[i]->Dscr.c_str() ));
+            cJSON_AddItemToObject(bodyObj, "waitss", cJSON_CreateNumber( Node_Do[i]->waitss ));
+            cJSON_AddItemToObject(bodyObj, "isDo", cJSON_CreateNumber( Node_Do[i]->isDo ));
+            cJSON_AddItemToObject(bodyObj, "SCM_ID", cJSON_CreateNumber( Node_Do[i]->SCM_ID ));
+
+           cJSON_AddItemToObject(body, "RECORDS", bodyObj);
+
+
+    }
+     cJSON_AddItemToObject(root, "RECORDS", body);
+
+    char *printBuf = cJSON_Print(root);
+
+
+   FILE * pFile;
+   long lSize;
+   size_t result;
+
+   pFile = fopen ( filename.c_str() , "wb" );
+   if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+
+   // write the buffer  into the file:
+   lSize = strlen(printBuf);
+   result = fwrite( printBuf, 1, lSize,pFile);
+   if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+   /* the whole file is now loaded in the memory buffer. */
+   // terminate
+   fclose (pFile);
+
+
+
+
+    return 0;
+}
 
 int stateMachine::load_TD_Task_D( )
 {
@@ -659,6 +929,66 @@ int stateMachine::load_TD_Task_D( )
    }
 
    return 0;
+}
+
+
+int stateMachine::save_TD_Task_D(std::string filename)
+{
+
+
+    cJSON * root = cJSON_CreateObject();
+    cJSON * body = cJSON_CreateArray();
+
+    for(int i = 0; i < Node_D.size(); i++)
+    {
+        for(int ii = 0; ii < Node_D[i].size(); ii++)
+        {
+           cJSON * bodyObj = cJSON_CreateObject();
+           cJSON_AddItemToObject(bodyObj, "id", cJSON_CreateNumber(Node_D[i][ii]->node.id));
+           cJSON_AddItemToObject(bodyObj, "M_id", cJSON_CreateNumber(Node_D[i][ii]->node.id));
+
+           cJSON_AddItemToObject(bodyObj, "Step", cJSON_CreateNumber( Node_D[i][ii]->node.Step  ));
+           cJSON_AddItemToObject(bodyObj, "Dscr", cJSON_CreateString( Node_D[i][ii]->node.Dscr.c_str()  ));
+           cJSON_AddItemToObject(bodyObj, "isPlaying", cJSON_CreateNumber(Node_D[i][ii]->node.isPlaying ));
+           cJSON_AddItemToObject(bodyObj, "isEnd", cJSON_CreateNumber(Node_D[i][ii]->node.isEnd ));
+           //cJSON_AddItemToObject(bodyObj, "dt", cJSON_CreateNumber(Node_D[i][ii]->node ));
+           cJSON_AddItemToObject(bodyObj, "isPlayed", cJSON_CreateNumber(Node_D[i][ii]->node.isPlayed ));
+           cJSON_AddItemToObject(bodyObj, "point", cJSON_CreateNumber(Node_D[i][ii]->node.point ));
+           cJSON_AddItemToObject(bodyObj, "isBegin", cJSON_CreateNumber(Node_D[i][ii]->node.isBegin ));
+           cJSON_AddItemToObject(bodyObj, "isManualEnd", cJSON_CreateNumber(Node_D[i][ii]->node.isManualEnd ));
+
+           cJSON_AddItemToObject(body, "RECORDS", bodyObj);
+        }
+
+    }
+     cJSON_AddItemToObject(root, "RECORDS", body);
+
+    char *printBuf = cJSON_Print(root);
+
+
+   FILE * pFile;
+   long lSize;
+   size_t result;
+
+   pFile = fopen ( filename.c_str() , "wb" );
+   if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+
+   // write the buffer  into the file:
+   lSize = strlen(printBuf);
+   result = fwrite( printBuf, 1, lSize,pFile);
+   if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+   /* the whole file is now loaded in the memory buffer. */
+   // terminate
+   fclose (pFile);
+
+
+
+
+
+
+    return 0;
 }
 
 static int flag = 0;
@@ -1201,3 +1531,30 @@ int stateMachine::tick()
 
   }
 }
+
+
+
+int stateMachine::backup()
+{
+    QDate currentData = QDate::currentDate();
+    QTime *time = new QTime();
+
+    QString dirname = currentData.toString("yyyy-MM-dd") + "-" + time->currentTime().toString("hh-mm-ss");
+    QDir dir;
+    dir.mkpath(dirname);
+
+
+    save_TD_Task_D_Do(dirname.toStdString() + "//TD_Task_D_Do.json");
+
+    save_TD_Task_D_IF(dirname.toStdString() + "//TD_Task_D_IF.json");
+
+    save_TD_Task_D(dirname.toStdString() + "//TD_Task_D.json");
+
+    save_TD_DB_TO_SCM(dirname.toStdString() + "//TD_DB_TO_SCM.json");
+
+    save_TD_SCM_TO_DB(dirname.toStdString() + "//TD_SCM_TO_DB.json");
+
+    save_TD_IP(dirname.toStdString() + "//TD_IP.json");
+}
+
+

@@ -13,28 +13,33 @@ SOURCES += \
     edge.cpp \
     fsm.cpp \
     ifconditionoptdialog.cpp \
-    ioboard.cpp \
-    ioboardproperty.cpp \
+    inputBoard.cpp \
+    inputBoardproperty.cpp \
     main.cpp \
     mainwindow.cpp \
     mqtt.cpp \
     msgQueue.cpp \
     mysquare.cpp \
     node.cpp \
+    outputBoard.cpp \
+    outputBoardproperty.cpp \
     signalThread.cpp
 
 HEADERS += \
     cJSON.h \
+    diagram.h \
     edge.h \
     fsm.h \
     ifconditionoptdialog.h \
-    ioboard.h \
-    ioboardproperty.h \
+    inputBoard.h \
+    inputBoardproperty.h \
     mainwindow.h \
     mqtt.h \
     msgQueue.hpp \
     mysquare.h \
     node.h \
+    outputBoard.h \
+    outputBoardproperty.h \
     signalThread.h
 
 FORMS += \

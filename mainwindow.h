@@ -31,6 +31,9 @@ public slots:
 
         void edgeProperty();
         void TimerUpdate();
+        void runButtonSlot();
+        void stopButtonSlot();
+        void saveButtonSlot();
 private:
 
     QTimer *mainTimer;

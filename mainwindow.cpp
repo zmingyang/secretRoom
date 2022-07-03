@@ -25,8 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     condictionAction = new QAction(QString::fromLocal8Bit("下一步使能"), this);
 
 
-
-
     itemMenu->addAction(stepHere);
     itemMenu->addAction(stop);
 
@@ -96,7 +94,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     mainTimer = new QTimer(this);
     connect(mainTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()));
-    mainTimer->start(100);
+    //mainTimer->start(100);
+
+
+    connect(ui->runButton, SIGNAL(clicked()), this, SLOT(runButtonSlot()));
+    connect(ui->stopButton, SIGNAL(clicked()), this, SLOT(stopButtonSlot()));
+    connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(saveButtonSlot()));
+
+
 }
 
 
@@ -105,7 +110,19 @@ void MainWindow::TimerUpdate()
     qDebug() << "update";
     fsm.tick();
 }
-
+void MainWindow::runButtonSlot()
+{
+    mainTimer->start(100);
+}
+void MainWindow::stopButtonSlot()
+{
+    mainTimer->stop();
+}
+void MainWindow::saveButtonSlot()
+{
+    qDebug() << "clicked";
+    fsm.backup();
+}
 
 void MainWindow::colorRed()
 {
